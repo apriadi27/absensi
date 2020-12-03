@@ -6,7 +6,7 @@ import axios from 'axios'
 
 Vue.config.productionTip = false
 
-Vue.prototype.$userApi = axios.create({
+Vue.prototype.$api = axios.create({
 	baseURL: 'http://localhost/absensi/api/',
 	responseType: 'json',
 	headers: {
