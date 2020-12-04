@@ -10,9 +10,9 @@
 			while ($re = mysqli_fetch_assoc($query)) {
 				$istirahatJam = ((new DateTime($re['start_istirahat']))->diff(new DateTime($re['end_istirahat'])))->h;
 				$istirahatMenit = ((new DateTime($re['start_istirahat']))->diff(new DateTime($re['end_istirahat'])))->i;
-				$istirahat = ($istirahatJam > 0) ? $istirahatJam . ' jam ' . $istirahatMenit . ' menit' : $istirahatMenit . ' menit';
+				$istirahat = ($re['start_istirahat'] != '00:00:00' && $re['end_istirahat'] != '00:00:00') ? ($istirahatJam > 0) ? $istirahatJam . ' jam ' . $istirahatMenit . ' menit' : $istirahatMenit . ' menit' : '';
 
-				if (isset($re['end'])) {
+				if (isset($re['end']) && $re['end'] != '00:00:00') {
 					$lamaJam = ($istirahatJam > 0) ? (((new DateTime($re['start']))->diff(new DateTime($re['end'])))->h) - $istirahatJam : ((new DateTime($re['start']))->diff(new DateTime($re['end'])))->h;
 					
 					$lamaMenit = ((new DateTime($re['start']))->diff(new DateTime($re['end'])))->i;
@@ -39,7 +39,7 @@
 				array_push($val['data'], [
 					"date"   			=> (new DateTime($re['date']))->format('d F Y'),
 					"start"      		=> $re['start'],
-					"end"				=> $re['end'],
+					"end"				=> ($re['end'] == '00:00:00') ? '' : $re['end'],
 					"startIstirahat"	=> $re['start_istirahat'],
 					"endIstirahat"		=> $re['end_istirahat'],
 					"ket"				=> ($re['ket']) ? $re['ket'] : '-',
