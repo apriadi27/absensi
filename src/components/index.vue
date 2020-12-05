@@ -1,6 +1,21 @@
 <template>
 	<div class="container">
-		<v-btn color="primary" class="my-6" @click="modal('Absen')">Absen</v-btn>
+		<div class="my-6">
+			<v-btn color="primary" @click="modal('Absen')">Absen</v-btn>
+			<export-excel
+				class="float-right"
+				:name="(new Date()).getFullYear() + '-' + (new Date()).getMonth() + '.xls'"
+				:data="data"
+				:fields="field"
+				:footer="'Total : ' + total.jam + ' jam ' + total.menit + ' menit '"
+			>
+				<v-btn color="secondary">Export</v-btn>
+			</export-excel>
+		</div>
+
+		<div class="mb-6">
+			Total : {{ total.jam }} jam {{ total.menit }} menit
+		</div>
 
 		<v-card>
 			<v-data-table
@@ -294,6 +309,18 @@ export default {
 				},
 				loading: false,
 				title: ''
+			},
+			field: {
+				'Tanggal': 'date',
+				'Masuk': 'start',
+				'Pulang': 'end',
+				'Istirahat': 'istirahat',
+				'Lama': 'lama',
+				'Catatan': 'ket'
+			},
+			total: {
+				jam: 0,
+				menit: 0
 			}
 		}
 	},
@@ -305,7 +332,13 @@ export default {
 			let self = this
 			this.$api.get('getData.php')
 				.then(function (res) {
-					(res.data.error) ? self.$emit('getAlert', res.data.msg, 'error') : self.data = res.data.data
+					if (res.data.error) {
+						self.$emit('getAlert', res.data.msg, 'error')
+					} else {
+						self.data = res.data.data
+						self.total.jam = res.data.totalJam
+						self.total.menit = res.data.totalMenit
+					}
 				})
 			this.table.loading = false
 		},

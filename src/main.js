@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './plugins/router'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
+import excel from './plugins/excel'
 
 Vue.config.productionTip = false
 
@@ -15,6 +16,7 @@ Vue.prototype.$api = axios.create({
 })
 
 new Vue({
+	excel,
 	vuetify,
 	router,
 	render: h => h(App),
