@@ -1,21 +1,23 @@
 <template>
 	<div class="container">
-		<div class="my-6">
-			<v-btn color="primary" @click="modal('Absen')">Absen</v-btn>
-			<export-excel
-				class="float-right"
-				:name="(new Date()).getFullYear() + '-' + (new Date()).getMonth() + '.xls'"
-				:data="data"
-				:fields="field"
-				:footer="'Total : ' + total.jam + ' jam ' + total.menit + ' menit '"
-			>
-				<v-btn color="secondary">Export</v-btn>
-			</export-excel>
-		</div>
-
-		<div class="mb-6">
-			Total : {{ total.jam }} jam {{ total.menit }} menit
-		</div>
+		<v-row class="mb-5" align="center">
+			<v-col>
+				Total : <span class="font-weight-bold">{{ total.jam }} jam {{ total.menit }} menit</span>
+			</v-col>
+			<v-col>
+				<v-row justify="end" class="mr-0">
+					<v-btn color="primary" @click="modal('Absen')" class="mr-6">Absen</v-btn>
+					<export-excel
+						:name="(new Date()).getFullYear() + '-' + (new Date()).getMonth() + '.xls'"
+						:data="data"
+						:fields="field"
+						:footer="'Total : ' + total.jam + ' jam ' + total.menit + ' menit '"
+					>
+						<v-btn color="secondary">Export</v-btn>
+					</export-excel>
+				</v-row>
+			</v-col>
+		</v-row>
 
 		<v-card>
 			<v-data-table
