@@ -4,6 +4,7 @@
 	try {
 		$val['data'] = array();
 		$date = date('Y-m-');
+		$totalJam = $totalMenit = 0;
 
 		$sql = "SELECT * FROM time WHERE date LIKE '$date%'";
 		if($query = mysqli_query($conn, $sql)){
@@ -32,16 +33,19 @@
 					}
 
 					$lama = ($lamaJam > 0) ? $lamaJam . ' jam ' . $lamaMenit . ' menit' : $lamaMenit . ' menit';
+
+					$totalJam = $totalJam + $lamaJam;
+					$totalMenit = $totalMenit + $lamaMenit;
 				} else {
 					$lama = '';
 				}
 
 				array_push($val['data'], [
 					"date"   			=> (new DateTime($re['date']))->format('d F Y'),
-					"start"      		=> $re['start'],
-					"end"				=> ($re['end'] == '00:00:00') ? '' : $re['end'],
-					"startIstirahat"	=> $re['start_istirahat'],
-					"endIstirahat"		=> $re['end_istirahat'],
+					"start"      		=> substr($re['start'], 0, 5),
+					"end"				=> ($re['end'] == '00:00:00') ? '' : substr($re['end'], 0, 5),
+					"startIstirahat"	=> substr($re['start_istirahat'], 0, 5),
+					"endIstirahat"		=> substr($re['end_istirahat'], 0, 5),
 					"ket"				=> ($re['ket']) ? $re['ket'] : '-',
 					"lama"				=> $lama,
 					"key"				=> $re['created_at'],
@@ -51,6 +55,10 @@
 		}else{
 			throw new Exception("Gagal mendapatkan data absensi");
 		}
+
+		$menitToJam = floor($totalMenit / 60);
+		$val['totalJam'] = $totalJam = $totalJam + $menitToJam;
+		$val['totalMenit'] = $totalMenit = $totalMenit - ($menitToJam * 60);
 	} catch (\Exception $e) {
 		$val['error'] = true;
 		$val['msg'] = $e->getMessage();
