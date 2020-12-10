@@ -9,15 +9,7 @@
 		$istirahatEnd = mysqli_real_escape_string($conn, $_POST['istirahatEnd']);
 		$key = mysqli_real_escape_string($conn, $_POST['key']);
 		
-		if (isset($re['end'])) {
-			$lamaJam = ((new DateTime($re['start']))->diff(new DateTime($re['end'])))->h;
-			$lamaMenit = ((new DateTime($re['start']))->diff(new DateTime($re['end'])))->i;
-			$lama = ($lamaJam > 0) ? $lamaJam . ' jam ' . $lamaMenit . ' menit' : $lamaMenit . ' menit';
-		} else {
-			$lama = '';
-		}
-
-		$sql = "UPDATE time SET start = '$start', end = '$end', start_istirahat = '$istirahatStart', end_istirahat = '$istirahatEnd', ket = '$ket', lama = '$lama' WHERE created_at = '$key'";
+		$sql = "UPDATE time SET start = '$start', end = '$end', start_istirahat = '$istirahatStart', end_istirahat = '$istirahatEnd', ket = '$ket' WHERE created_at = '$key'";
 		$logText .= $sql." | ".date('H:i:s')."\n";
 		if (!$query = mysqli_query($conn, $sql)) throw new Exception("Gagal mengubah absen");
 	} catch (\Exception $e) {
