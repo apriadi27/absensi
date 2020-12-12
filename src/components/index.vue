@@ -6,18 +6,61 @@
 			</v-col>
 			<v-col>
 				<v-row justify="end" class="mr-0">
-					<v-btn color="primary" @click="modal('Absen')" class="mr-6">Absen</v-btn>
+					<v-btn color="primary" @click="modal('Absen')" class="mr-6">
+						<v-icon left>mdi-calendar-clock</v-icon>Absen
+					</v-btn>
 					<export-excel
 						:name="(new Date()).getFullYear() + '-' + (new Date()).getMonth() + '.xls'"
 						:data="data"
 						:fields="field"
 						:footer="'Total : ' + total.jam + ' jam ' + total.menit + ' menit '"
+						class="mr-6"
 					>
-						<v-btn color="secondary">Export</v-btn>
+						<v-btn color="secondary">
+							<v-icon left>mdi-file</v-icon>Export
+						</v-btn>
 					</export-excel>
+					<v-btn color="info" @click="refresh.fromButton = false; getData()" :loading="refresh.loading">
+						<v-icon left>mdi-refresh</v-icon>Refresh
+					</v-btn>
 				</v-row>
 			</v-col>
 		</v-row>
+
+		<v-form ref="formGetData" class="mt-n6">
+			<v-row align="center">
+				<v-col class="col-2">
+					<v-overflow-btn
+						label="Bulan"
+						:items="get.bulan.option"
+						v-model="get.bulan.value"
+						:rules="[
+							v => !!v || 'Required'
+						]"
+					/>
+				</v-col>
+				<v-col class="col-2">
+					<v-overflow-btn
+						label="Tahun"
+						:items="get.tahun.option"
+						v-model="get.tahun.value"
+						:rules="[
+							v => !!v || 'Required'
+						]"
+					/>
+				</v-col>
+				<v-col>
+					<v-btn
+						color="primary"
+						class="mt-n3"
+						@click="get.fromButton = true; getData()"
+						:loading="get.loading"
+					>
+						Get Data
+					</v-btn>
+				</v-col>
+			</v-row>
+		</v-form>
 
 		<v-card>
 			<v-data-table
@@ -323,6 +366,22 @@ export default {
 			total: {
 				jam: 0,
 				menit: 0
+			},
+			get: {
+				bulan: {
+					value: '',
+					option: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+				},
+				tahun: {
+					value: '',
+					option: []
+				},
+				fromButton: false,
+				loading: false
+			},
+			refresh: {
+				fromButton: false,
+				loading: false
 			}
 		}
 	},
@@ -330,19 +389,30 @@ export default {
 		this.getData()
 	},
 	methods: {
-		getData () {
-			let self = this
-			this.$api.get('getData.php')
-				.then(function (res) {
-					if (res.data.error) {
-						self.$emit('getAlert', res.data.msg, 'error')
-					} else {
-						self.data = res.data.data
-						self.total.jam = res.data.totalJam
-						self.total.menit = res.data.totalMenit
-					}
-				})
-			this.table.loading = false
+		getData: async function () {
+			let fd = new FormData()
+			if (this.get.fromButton) {
+				if (this.$refs.formGetData.validate()) {
+					fd.append('bulan', this.get.bulan.value)
+					fd.append('tahun', this.get.tahun.value)
+					this.get.loading = true
+				} else {
+					return
+				}
+			}
+
+			if (this.refresh.fromButton) this.refresh.loading = true
+
+			let res = await this.$api.post('getData.php', fd)
+			if (res.data.error) {
+				this.$emit('getAlert', res.data.msg, 'error')
+			} else {
+				this.data = res.data.data
+				this.total.jam = res.data.totalJam
+				this.total.menit = res.data.totalMenit
+				this.get.tahun.option = res.data.tahun
+			}
+			this.refresh.loading = this.get.fromButton = this.get.loading = this.table.loading = false
 		},
 		absen: async function () {
 			if (this.$refs.form.validate()) {

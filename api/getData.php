@@ -3,8 +3,33 @@
 
 	try {
 		$val['data'] = array();
-		$date = date('Y-m-');
 		$totalJam = $totalMenit = 0;
+		$year = array();
+
+		$bulan = (isset($_POST['bulan'])) ? $_POST['bulan'] : null;
+		$tahun = (isset($_POST['tahun'])) ? $_POST['tahun'] : null;
+
+		if ($bulan) {
+			$bulanValue = [
+				'Januari' => '-01-',
+				'Februari' => '-02-',
+				'Maret' => '-03-',
+				'April' => '-04-',
+				'Mei' => '-05-',
+				'Juni' => '-06-',
+				'Juli' => '-07-',
+				'Agustus' => '-08-',
+				'September' => '-09-',
+				'Oktober' => '-10-',
+				'November' => '-11-',
+				'Desember' => '-12-'
+			];
+			foreach ($bulanValue as $key => $value) {
+				if ($key == $bulan) $bulan = $value;
+			}
+		}
+
+		$date = ($bulan && $tahun) ? $tahun . $bulan : date('Y-m-');
 
 		$sql = "SELECT * FROM time WHERE date LIKE '$date%'";
 		if($query = mysqli_query($conn, $sql)){
@@ -56,9 +81,23 @@
 			throw new Exception("Gagal mendapatkan data absensi");
 		}
 
+		$sql = "SELECT YEAR(created_at) FROM time GROUP BY YEAR(created_at) ORDER BY YEAR(created_at) ASC";
+		$stmt = $conn->prepare($sql);
+		if ($stmt->execute()) {
+			$stmt->store_result();
+			$stmt->bind_result($resYear);
+			while ($stmt->fetch()) {
+				array_push($year, $resYear);
+			}
+		}else{
+			throw new Exception("Gagal mendapatkan data tahun");
+		}
+    	$stmt->close();
+
 		$menitToJam = floor($totalMenit / 60);
 		$val['totalJam'] = $totalJam = $totalJam + $menitToJam;
 		$val['totalMenit'] = $totalMenit = $totalMenit - ($menitToJam * 60);
+		$val['tahun'] = $year;
 	} catch (\Exception $e) {
 		$val['error'] = true;
 		$val['msg'] = $e->getMessage();
