@@ -30,8 +30,10 @@
 		}
 
 		$date = ($bulan && $tahun) ? $tahun . $bulan : date('Y-m-');
+		$val['thisYear'] = ($tahun) ? $tahun : date('Y');
+		$val['thisMonth'] = ($bulan) ? substr($bulan, 1, 2) : date('m');
 
-		$sql = "SELECT * FROM time WHERE date LIKE '$date%'";
+		$sql = "SELECT * FROM time WHERE date LIKE '$date%' ORDER BY date DESC";
 		if($query = mysqli_query($conn, $sql)){
 			while ($re = mysqli_fetch_assoc($query)) {
 				$istirahatJam = ((new DateTime($re['start_istirahat']))->diff(new DateTime($re['end_istirahat'])))->h;

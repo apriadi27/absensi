@@ -10,8 +10,8 @@
 						<v-icon left>mdi-calendar-clock</v-icon>Absen
 					</v-btn>
 					<export-excel
-						:name="(new Date()).getFullYear() + '-' + (new Date()).getMonth() + '.xls'"
-						:data="data"
+						:name="date + '.xls'"
+						:data="dataExcel"
 						:fields="field"
 						:footer="'Total : ' + total.jam + ' jam ' + total.menit + ' menit '"
 						class="mr-6"
@@ -299,7 +299,9 @@
 export default {
 	data () {
 		return {
+			date: '',
 			data: [],
+			dataExcel: [],
 			table: {
 				loading: true,
 				header: [
@@ -408,9 +410,11 @@ export default {
 				this.$emit('getAlert', res.data.msg, 'error')
 			} else {
 				this.data = res.data.data
+				this.dataExcel = this.data.reverse()
 				this.total.jam = res.data.totalJam
 				this.total.menit = res.data.totalMenit
 				this.get.tahun.option = res.data.tahun
+				this.date = res.data.thisYear + '-' + res.data.thisMonth
 			}
 			this.refresh.loading = this.get.fromButton = this.get.loading = this.table.loading = false
 		},
