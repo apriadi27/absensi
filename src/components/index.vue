@@ -410,7 +410,7 @@ export default {
 				this.$emit('getAlert', res.data.msg, 'error')
 			} else {
 				this.data = res.data.data
-				this.dataExcel = this.data.reverse()
+				this.dataExcel = JSON.parse(JSON.stringify((this.data))).reverse()
 				this.total.jam = res.data.totalJam
 				this.total.menit = res.data.totalMenit
 				this.get.tahun.option = res.data.tahun
